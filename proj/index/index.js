@@ -1,73 +1,54 @@
-// Variáveis para armazenar participantes
+// Lista de participantes armazenada no localStorage
 const participantes = JSON.parse(localStorage.getItem("participantes")) || [];
 
-document.getElementById("btnAdicionar").addEventListener("click", () => {
-    const nome = prompt("Digite o nome do participante:");
-    if (nome) {
-        participantes.push(nome);
-        localStorage.setItem("participantes", JSON.stringify(participantes));
-        alert("Participante adicionado com sucesso!");
-    }
-});
-
-
-// Elementos do DOM
-const sorteador = document.getElementById("sorteador");
-const consulta = document.getElementById("consulta");
+// Seleção de elementos do DOM
+const btnAdicionar = document.getElementById("btnAdicionar");
+const btnSortear = document.getElementById("btnSortear");
+const btnLimpar = document.getElementById("btnLimpar");
 const dialogResultado = document.getElementById("dialogResultado");
 const resultadoTexto = document.getElementById("resultadoTexto");
-const listaParticipantes = document.getElementById("listaParticipantes");
-
-const btnAdicionar = document.getElementById("btnAdicionar");
-const btnConsultar = document.getElementById("btnConsultar");
-const btnSortear = document.getElementById("btnSortear");
 const btnFecharDialogo = document.getElementById("btnFecharDialogo");
-const btnVoltar = document.getElementById("btnVoltar");
 
-// Funções auxiliares
-function mostrarPagina(pagina) {
-    sorteador.classList.add("oculto");
-    consulta.classList.add("oculto");
-    pagina.classList.remove("oculto");
+// Atualiza localStorage com a lista atualizada
+function salvarParticipantes() {
+    localStorage.setItem("participantes", JSON.stringify(participantes));
 }
 
-function atualizarListaParticipantes() {
-    listaParticipantes.innerHTML = "";
-    participantes.forEach((nome, index) => {
-        const li = document.createElement("li");
-        li.textContent = `${index + 1}. ${nome}`;
-        listaParticipantes.appendChild(li);
-    });
-}
-
-// Eventos
+// Função para adicionar participantes
 btnAdicionar.addEventListener("click", () => {
     const nome = prompt("Digite o nome do participante:");
     if (nome) {
         participantes.push(nome);
-        alert("Participante adicionado com sucesso!");
+        salvarParticipantes();
+        alert(`Participante ${nome} adicionado!`);
+    } else {
+        alert("Nenhum nome foi inserido.");
     }
 });
 
-btnConsultar.addEventListener("click", () => {
-    atualizarListaParticipantes();
-    mostrarPagina(consulta);
-});
-
+// Função para sortear participantes
 btnSortear.addEventListener("click", () => {
     if (participantes.length < 2) {
-        alert("Adicione pelo menos 2 participantes antes de sortear.");
+        alert("É necessário pelo menos 2 participantes para realizar o sorteio.");
         return;
     }
-    const sorteado = participantes[Math.floor(Math.random() * participantes.length)];
+
+    const indiceSorteado = Math.floor(Math.random() * participantes.length);
+    const sorteado = participantes[indiceSorteado];
+
     resultadoTexto.textContent = `O sorteado foi: ${sorteado}`;
     dialogResultado.showModal();
 });
 
+// Função para fechar o diálogo de resultado
 btnFecharDialogo.addEventListener("click", () => {
     dialogResultado.close();
 });
 
-btnVoltar.addEventListener("click", () => {
-    mostrarPagina(sorteador);
+// Função para recomeçar o sorteio
+btnLimpar.addEventListener("click", () => {
+    participantes.length = 0; // Limpa a lista de participantes
+    salvarParticipantes(); // Atualiza o localStorage
+    alert("O sorteio foi reiniciado. Todos os dados foram apagados.");
+    location.reload(); // Recarrega a página
 });
